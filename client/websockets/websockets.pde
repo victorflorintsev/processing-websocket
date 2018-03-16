@@ -24,7 +24,7 @@ ArrayList<Player> list = new ArrayList<Player>();
 void setup() {
   size(1920,1080);
   background(75);
-  ws = new WebsocketClient(this, "ws://localhost:3000/");
+  ws = new WebsocketClient(this, "ws://quiver-gum.glitch.me");
 }
 
 void draw() {
