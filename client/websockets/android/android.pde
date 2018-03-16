@@ -56,7 +56,7 @@ public class EmptyClient extends WebSocketClient {
 
 }
 
- //<>//
+
 WebSocketClient client;
 void setup() {
   size(1920,1080);
