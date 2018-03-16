@@ -8,13 +8,17 @@ class Player {
   
   Player(int x, int y) {
     pos = new PVector(x,y);
+  }
+  
+  void draw() {
+    println(pos);
     noStroke();
     fill(255, 77, 77);
-    rect(x,y,20,20);
+    rect(pos.x,pos.y,20,20); 
   }
   
   String toJSON() {
-   return "{\"event\": \"newPlayer\", \"x\": " + pos.x + ", \"y\": " + pos.y + "}"; 
+    return new JSONObject().setString("event", "newPlayer").setInt("x", int(pos.x)).setInt("y", int(pos.y)).toString();
   }
   
 }
@@ -28,9 +32,28 @@ void setup() {
 }
 
 void draw() {
- if (mousePressed) {
-  Player newPlayer = new Player(mouseX, mouseY);
-  list.add(newPlayer);
-  ws.sendMessage(newPlayer.toJSON());
+ drawAll(list);
+ if (mousePressed) {  
+  ws.sendMessage(new Player(mouseX, mouseY).toJSON());
  }
+}
+
+void drawAll(ArrayList<Player> l) {
+  for (Player p : l) {
+    p.draw();
+  }
+}
+
+void webSocketEvent(String msg){
+  JSONObject json = parseJSONObject(msg);
+  if (json == null) {
+    println("JSONObject could not be parsed");
+  } else {
+    println(json.getString("event"));
+    if (json.getString("event").equals("newPlayerRPC")) {
+      Player player = new Player(json.getInt("x"), json.getInt("y"));
+      player.draw();
+      list.add(player);
+    }
+  }
 }

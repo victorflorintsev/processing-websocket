@@ -1,5 +1,3 @@
-// goes in glitch.com
-
 var Server = require('ws').Server;
 var port = process.env.PORT || 3000;
 var ws = new Server({
@@ -20,6 +18,7 @@ ws.on('connection', function(w) {
         if (command.event == "newPlayer") {
 
             console.log("NewPlayer at coordinates: x = " + command.x + " y = " + command.y);
+            w.send(JSON.stringify({"event": "newPlayerRPC", "x": command.x, "y": command.y}));
         }
     });
 
