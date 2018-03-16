@@ -14,7 +14,7 @@ class Player {
   }
   
   String toJSON() {
-   return "{'event': 'newPlayer', 'x': " + pos.x + ", 'y': " + pos.y + "}"; 
+   return "{\"event\": \"newPlayer\", \"x\": " + pos.x + ", \"y\": " + pos.y + "}"; 
   }
   
 }
