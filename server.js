@@ -26,8 +26,11 @@ ws.on('connection', function(w) {
         if (command.event == "newPlayer") {
 
             console.log("NewPlayer at coordinates: x = " + command.x + " y = " + command.y);
-            for (var conn in all_active_connections)
-              all_active_connections[conn].send(JSON.stringify({"event": "newPlayerRPC", "x": command.x, "y": command.y}));
+            for (var conn in all_active_connections) {
+              command["event"] = "newPlayerRPC";
+              //JSON.stringify({"event": "newPlayerRPC", "x": command.x, "y": command.y, "color": command.color}) old way
+              all_active_connections[conn].send(JSON.stringify(command));
+            }
         }
     });
 

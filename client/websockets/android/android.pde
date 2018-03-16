@@ -19,25 +19,25 @@ public class EmptyClient extends WebSocketClient {
 
   @Override
   public void onOpen(ServerHandshake handshakedata) {
-    send("Hello, it is me. Mario :)");
-    System.out.println("new connection opened");
+    connected = true;
+    println("new connection opened");
   }
 
   @Override
   public void onClose(int code, String reason, boolean remote) {
-    System.out.println("closed with exit code " + code + " additional info: " + reason);
+    println("closed with exit code " + code + " additional info: " + reason);
   }
 
   @Override
   public void onMessage(String msg) {
-    System.out.println("received message: " + msg);
+    println("received message: " + msg);
 
     JSONObject json = parseJSONObject(msg);
                 if (json == null) {
                   println("JSONObject could not be parsed");
                 } else {
                   if (json.getString("event").equals("newPlayerRPC")) {
-                    Player player = new Player(json.getInt("x"), json.getInt("y"));
+                    Player player = new Player(json.getInt("x"), json.getInt("y"), json.getString("color"));
                     player.draw();
                     list.add(player);
                   }
@@ -46,7 +46,7 @@ public class EmptyClient extends WebSocketClient {
 
   @Override
   public void onMessage(ByteBuffer message) {
-    System.out.println("received ByteBuffer");
+    println("received ByteBuffer");
   }
 
   @Override
@@ -56,10 +56,13 @@ public class EmptyClient extends WebSocketClient {
 
 }
 
+String[] colors = {"#c56cf0", "#ffb8b8", "#ff3838", "#ff9f1a", "#fff200", "#32ff7e", "#7efff5", "#18dcff", "#7d5fff", "#4b4b4b"};
+String mycolor = colors[int(random(0,colors.length))];
+boolean connected = false;
 
 WebSocketClient client;
 void setup() {
-  size(1920,1080);
+  fullScreen();
   background(75);
   
   try {
@@ -70,19 +73,22 @@ void setup() {
 
 class Player {
   PVector pos;
+  String col;
   
-  Player(int x, int y) {
+  Player(int x, int y, String col1) {
     pos = new PVector(x,y);
+    col = col1; // Easy to do load JSON.
+    
   }
   
   void draw() {
     noStroke();
-    fill(255, 77, 77);
+    fill(color(unhex("FF" + col.substring(1)))); // Getting the color string to the correct type (type [color])
     rect(pos.x,pos.y,20,20); 
   }
   
   String toJSON() {
-    return new JSONObject().setString("event", "newPlayer").setInt("x", int(pos.x)).setInt("y", int(pos.y)).toString();
+    return new JSONObject().setString("event", "newPlayer").setInt("x", int(pos.x)).setInt("y", int(pos.y)).setString("color", col).toString();
   }
   
 }
@@ -93,9 +99,12 @@ ArrayList<Player> list = new ArrayList<Player>();
 
 void draw() {
  drawAll(list);
- if (mousePressed) {
-  client.send(new Player(mouseX, mouseY).toJSON());
- }
+}
+
+void mouseDragged() {
+  if (connected) {
+   client.send(new Player(mouseX, mouseY, mycolor).toJSON()); 
+  } 
 }
 
 void drawAll(ArrayList<Player> l) {
